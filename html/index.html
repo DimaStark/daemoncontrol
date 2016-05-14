@@ -1,0 +1,32 @@
+<html>
+    <head>
+        <style>
+        #controls {
+            {{ "" if state else "display: none;" }}
+        }
+        </style>
+    </head>
+    <body>
+        <p>
+            {{ "Service is {}able".format("en" if state else "dis") }}
+        </p>
+        <p>
+            {{ "Daemon is {}".format(status) }}
+        </p>
+        <a href="/switch">
+            <button>
+                {{ "{}able service".format("Dis" if state else "En") }}
+            </button>
+        </a>
+        <div id="controls">
+            <a href="/{{ 'stop' if status == 'active' else 'start' }}">
+                <button>
+                    {{ 'Stop' if status == 'active' else 'Start' }} daemon
+                </button>
+            </a>
+            <a href="/restart">
+                <button>Restart daemon</button>
+            </a>
+        </div>
+    </body>
+</html>
