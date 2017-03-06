@@ -2,14 +2,14 @@ import setuptools
 
 
 setuptools.setup(
-    name='web-daemon-control',
+    name='daemonctl',
     version='1.0',
     description='Server for remote control daemons via web interface',
     author='dimastark',
     author_email='dstarkdev@gmail.com',
     entry_points={
         'console_scripts': [
-            'web-daemon-control = web-daemon-control.main:main',
+            'daemonctl = daemonctl.main:main',
         ]
     },
     packages=setuptools.find_packages(
