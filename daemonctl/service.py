@@ -19,6 +19,9 @@ class Service:
         args = ['sudo', 'service'] + list(params)
         return create_subprocess_exec(*args, stdin=PIPE, stdout=PIPE)
 
+    def all_services(self):
+        return self.states.keys()
+
     def update_states(self):
         statuses = self.loop.run_until_complete(self.status_all())
         self.states = {i[1]: i[0] == '+' for i in statuses}
@@ -55,25 +58,21 @@ class Service:
     def status(self, name):
         return self.states[name]
 
+    def _state_to_html(self, name):
+        status = self.status(name)
+        html_class = 'on' if status else 'off'
+        status_char = '+' if status else '-'
+        return r'''
+            <tr class="{}">
+                <td>{}</td>
+                <td>{}</td>
+                <td><button>Старт</button></td>
+                <td><button>Стоп</button></td>
+                <td><button>Рестарт</button></td>
+                <td><button>Принудительная перезагрузка</button></td>
+            </tr>
+        '''.format(html_class, name, status_char)
 
-class Daemon:
-    def __init__(self, name, service=Service()):
-        self.service = service
-        self.name = name
-
-    async def start(self):
-        """Stop daemon"""
-        return await self.service.start(self.name)
-
-    async def stop(self):
-        """Stop daemon"""
-        return await self.service.stop(self.name)
-
-    async def restart(self):
-        """Restart daemon"""
-        return await self.service.restart(self.name)
-
-    @property
-    async def status(self):
-        """Status of current daemon"""
-        return await self.service.status(self.name)
+    def to_html(self):
+        names = sorted(self.states.keys())
+        return ''.join(map(self._state_to_html, names))

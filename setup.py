@@ -9,7 +9,7 @@ setuptools.setup(
     author_email='dstarkdev@gmail.com',
     entry_points={
         'console_scripts': [
-            'daemonctl = daemonctl.main:main',
+            'web-daemon-control = daemonctl.main:main',
         ]
     },
     packages=setuptools.find_packages(
