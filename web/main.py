@@ -4,23 +4,36 @@
 from os import path
 
 import asyncio
+import aiohttp
 from aiohttp import web
-
-from web.views import index
 
 __dir__ = path.dirname(path.realpath(__file__))
 
 
-def add_routes(app: web.Application) -> web.Application:
-    app.router.add_static('/static/', path.join(__dir__, '..', 'static'))
-    app.router.add_get('/', index)
+async def websocket_handler(request):
 
-    return app
+    ws = web.WebSocketResponse()
+    await ws.prepare(request)
+
+    async for msg in ws:
+        if msg.type == aiohttp.WSMsgType.TEXT:
+            if msg.data == 'close':
+                await ws.close()
+            else:
+                await ws.send_str(msg.data + '/answer')
+        elif msg.type == aiohttp.WSMsgType.ERROR:
+            print('ws connection closed with exception %s' %
+                  ws.exception())
+
+    print('websocket connection closed')
+
+    return ws
 
 
 def main():
     loop = asyncio.get_event_loop()
-    app = add_routes(web.Application(loop=loop))
+    app = web.Application(loop=loop)
+    app.router.get('/ws', websocket_handler)
     web.run_app(app, host='127.0.0.1', port=8080)
 
 
